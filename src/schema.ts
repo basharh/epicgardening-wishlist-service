@@ -1,29 +1,27 @@
+import { AppDataSource } from './db/data-source';
+import { Wishlist } from './db/entity/Wishlist';
+
 export const typeDefs = `#graphql
-  type Book {
-    title: String
-    author: String
+  type Product {
+    id: String
+    wishlists: [Wishlist]
+  }
+
+  type Wishlist {
+    name: String
+    products: [Product]
   }
 
   type Query {
-    books: [Book]
+    wishlists: [Wishlist]
   }
 `;
 
-const books = [
-  {
-    title: 'The Awakening',
-    author: 'Kate Chopin',
-  },
-  {
-    title: 'City of Glass',
-    author: 'Paul Auster',
-  },
-];
-
-// Resolvers define the technique for fetching the types defined in the
-// schema. This resolver retrieves books from the "books" array above.
 export const resolvers = {
   Query: {
-    books: () => books,
+    wishlists: async () => {
+      const wishlists = await AppDataSource.manager.find(Wishlist);
+      return wishlists;
+    },
   },
 };

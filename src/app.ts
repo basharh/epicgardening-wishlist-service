@@ -5,6 +5,7 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { AppDataSource } from './db/data-source';
 import { typeDefs, resolvers } from './schema';
 
 interface MyContext {
@@ -31,20 +32,23 @@ const server = new ApolloServer<MyContext>({
 // Set up our Express middleware to handle CORS, body parsing,
 // and our expressMiddleware function.
 
-server.start().then(() => {
-  app.use(
-    '/',
-    cors<cors.CorsRequest>(),
-    // 50mb is the limit that `startStandaloneServer` uses, but you may configure this to suit your needs
-    bodyParser.json({ limit: '50mb' }),
-    // expressMiddleware accepts the same arguments:
-    // an Apollo Server instance and optional configuration options
-    expressMiddleware(server, {
-      context: async ({ req }) => ({ token: req.headers.token }),
-    }),
-  );
+server
+  .start()
+  .then(() => AppDataSource.initialize())
+  .then(() => {
+    app.use(
+      '/',
+      cors<cors.CorsRequest>(),
+      // 50mb is the limit that `startStandaloneServer` uses, but you may configure this to suit your needs
+      bodyParser.json({ limit: '50mb' }),
+      // expressMiddleware accepts the same arguments:
+      // an Apollo Server instance and optional configuration options
+      expressMiddleware(server, {
+        context: async ({ req }) => ({ token: req.headers.token }),
+      }),
+    );
 
-  httpServer.listen({ port: 4000 }, () => {
-    console.log(`Server ready at http://localhost:4000/`);
+    httpServer.listen({ port: 4000 }, () => {
+      console.log(`Server ready at http://localhost:4000/`);
+    });
   });
-});
