@@ -1,0 +1,1 @@
+export const DEFAULT_WISHLIST_ID = 'f7d92009-9c36-483b-b77e-70432307e9ba';
