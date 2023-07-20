@@ -30,3 +30,22 @@ export async function addProductToWishlist(
 
   return await getWishlistWithProducts(wishlistId);
 }
+
+export async function removeProductFromWishlist(
+  wishlistId: string,
+  productId: string,
+) {
+  const wishlist = await getWishlistWithProducts(wishlistId);
+
+  if (wishlist == null) {
+    throw 'missing wishlist or product';
+  }
+
+  wishlist.products = wishlist.products.filter(
+    (product) => product.id != productId,
+  );
+
+  await ds.manager.save(wishlist);
+
+  return await getWishlistWithProducts(wishlistId);
+}
