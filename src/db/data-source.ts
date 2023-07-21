@@ -4,16 +4,31 @@ import { User } from './entity/User';
 import { Product } from './entity/Product';
 import { Wishlist } from './entity/Wishlist';
 
-export const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: 'localhost',
+const NODE_ENV = process.env.NODE_ENV;
+
+const common = {
+  host: process.env.POSTGRES_HOST,
   port: 5432,
-  username: 'epic',
-  password: '',
-  database: 'epic',
-  synchronize: false,
-  logging: false,
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DB,
   entities: [User, Product, Wishlist],
-  migrations: ['src/db/migration/*.ts'],
   subscribers: [],
-});
+};
+
+export const AppDataSource =
+  NODE_ENV === 'production'
+    ? new DataSource({
+        type: 'postgres',
+        ...common,
+        synchronize: false,
+        logging: false,
+        migrations: ['build/db/migration/*.js'],
+      })
+    : new DataSource({
+        type: 'postgres',
+        ...common,
+        synchronize: false,
+        logging: false,
+        migrations: ['src/db/migration/*.ts'],
+      });
