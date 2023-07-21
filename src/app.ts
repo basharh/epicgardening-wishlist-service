@@ -38,7 +38,7 @@ server
       }),
     );
 
-    httpServer.listen({ port: 4000 }, () => {
-      console.log(`Server ready at http://localhost:4000/`);
+    httpServer.listen({ port: process.env.PORT, host: '0.0.0.0' }, () => {
+      console.log(`Server ready at http://localhost:${process.env.PORT}/`);
     });
   });
